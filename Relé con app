@@ -1,0 +1,47 @@
+#include "BluetoothSerial.h"
+
+// Verifica si Bluetooth está habilitado en el ESP32
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled!
+#endif
+
+BluetoothSerial SerialBT;
+
+// --- PIN DEL RELÉ ---
+const int rele = 23;
+
+void setup() {
+  Serial.begin(115200);
+
+  // Configurar relé como salida
+  pinMode(rele, OUTPUT);
+
+  // Relé apagado al inicio
+  digitalWrite(rele, LOW);
+
+  // Bluetooth
+  SerialBT.begin("ESP32_RELE");
+  Serial.println("Bluetooth listo...");
+}
+
+void loop() {
+
+  if (SerialBT.available()) {
+
+    String comando = SerialBT.readString();
+    comando.trim();
+
+    Serial.print("Comando recibido: ");
+    Serial.println(comando);
+
+    // --- CONTROL DEL RELÉ ---
+    if (comando == "HOLA") {
+      digitalWrite(rele, HIGH);  // Enciende foco
+    } 
+    else if (comando == "ADIOS") {
+      digitalWrite(rele, LOW);   // Apaga foco
+    }
+  }
+
+  delay(20);
+  }
