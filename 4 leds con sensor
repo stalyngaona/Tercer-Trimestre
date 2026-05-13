@@ -1,0 +1,85 @@
+#include "BluetoothSerial.h"
+
+// Verifica si Bluetooth está habilitado en el ESP32
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
+
+// --- DEFINICIÓN DE PINES PARA LOS 4 LEDs ---
+const int led1 = 23; 
+const int led2 = 22; 
+const int led3 = 21; 
+const int led4 = 19; 
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Configurar los 4 pines como salidas (OUTPUT)
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+
+  // Asegurarnos de que todos empiecen apagados
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led4, LOW);
+
+  // Inicializar el Bluetooth (Este es el nombre que buscarás en la app)
+  SerialBT.begin("ESP32_Laboratorio"); 
+  Serial.println("Bluetooth listo. Empareja el dispositivo...");
+}
+
+void loop() {
+  // Revisa si hay datos llegando desde la app celular
+  if (SerialBT.available()) {
+    // Lee el texto entrante
+    String comando = SerialBT.readString();
+    
+    // Elimina espacios o saltos de línea ocultos para evitar errores
+    comando.trim(); 
+
+    // Imprime en el Monitor Serie lo que recibió (muy útil para comprobar que funciona)
+    Serial.print("Comando recibido: ");
+    Serial.println(comando);
+
+    // --- LÓGICA DE CONTROL DE LOS LEDs ---
+    
+    // LED 1
+    if (comando == "HOLA1") {
+      digitalWrite(led1, HIGH);
+    } 
+    else if (comando == "ADIOS1") {
+      digitalWrite(led1, LOW);
+    }
+    
+    // LED 2
+    else if (comando == "HOLA2") {
+      digitalWrite(led2, HIGH);
+    } 
+    else if (comando == "ADIOS2") {
+      digitalWrite(led2, LOW);
+    }
+
+    // LED 3
+    else if (comando == "HOLA3") {
+      digitalWrite(led3, HIGH);
+    } 
+    else if (comando == "ADIOS3") {
+      digitalWrite(led3, LOW);
+    }
+
+    // LED 4
+    else if (comando == "HOLA4") {
+      digitalWrite(led4, HIGH);
+    } 
+    else if (comando == "ADIOS4") {
+      digitalWrite(led4, LOW);
+    }
+  }
+  
+  delay(20); // Pequeña pausa de estabilidad
+}
