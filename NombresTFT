@@ -1,0 +1,69 @@
+#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+// Posiciones iniciales (fuera de pantalla)
+int xKevin = -100;
+int xGabriel = 240;
+int xStalyn = -100;
+int xJordy = 240;
+
+// Velocidad
+int velocidad = 3;
+
+// Colores dinámicos
+uint16_t colores[] = {TFT_RED, TFT_GREEN, TFT_BLUE, TFT_BLACK, TFT_ORANGE, TFT_PURPLE};
+int colorIndex = 0;
+
+void setup() {
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_WHITE);
+  tft.setTextSize(2);
+}
+
+void loop() {
+  tft.fillScreen(TFT_WHITE);
+
+  // ===== ANIMACIÓN DE ENTRADA =====
+  if (xKevin < 10) xKevin += velocidad;
+  if (xGabriel > 100) xGabriel -= velocidad;
+  if (xStalyn < 10) xStalyn += velocidad;
+  if (xJordy > 100) xJordy -= velocidad;
+
+  // ===== CAMBIO DE COLOR =====
+  uint16_t color = colores[colorIndex];
+
+  // ===== DIBUJAR NOMBRES =====
+  tft.setTextColor(color);
+  tft.setCursor(xKevin, 10);
+  tft.print("Kevin");
+
+  tft.setTextColor(colores[(colorIndex + 1) % 6]);
+  tft.setCursor(xGabriel, 10);
+  tft.print("Gabriel");
+
+  tft.setTextColor(colores[(colorIndex + 2) % 6]);
+  tft.setCursor(xStalyn, 40);
+  tft.print("Stalyn");
+
+  tft.setTextColor(colores[(colorIndex + 3) % 6]);
+  tft.setCursor(xJordy, 40);
+  tft.print("Jordy");
+
+  // ===== CIRCULOS CON EFECTO PULSO =====
+  int radio = 20 + (sin(millis() * 0.01) * 5);
+
+  tft.fillCircle(60, 150, radio, TFT_RED);
+  tft.fillCircle(120, 150, radio, TFT_GREEN);
+  tft.fillCircle(180, 150, radio, TFT_BLUE);
+
+  // ===== CAMBIO DE COLOR LENTO =====
+  static unsigned long tiempo = 0;
+  if (millis() - tiempo > 300) {
+    colorIndex = (colorIndex + 1) % 6;
+    tiempo = millis();
+  }
+
+  delay(30);
+}
